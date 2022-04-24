@@ -59,19 +59,19 @@ public:
 
 class octree {
 public:
-    float edge;// edge length
+    float edge; // edge length
     float half_edge;
     float edge_sq;
-    float mass = 0;// mass of all the particles inside this nodes's volume
-    int level = 0;// number of divisions required to get to this point
+    float mass = 0; // mass of all the particles inside this nodes's volume
+    int level = 0; // number of divisions required to get to this point
     int population = 0;
-    vec3* position;// position of the center of this node
+    vec3* position; // position of the center of this node
     vec3* min_position = new vec3();
     vec3* max_position = new vec3();
-    vec3* COM = new vec3();// center of mass
-    bool leaf = true;// whether not this node is a leaf node
-    bool populated = false;// some nodes might be empty. distinction is important
-    int* indices = nullptr;// array of the indices of the particles inside this node
+    vec3* COM = new vec3(); // center of mass
+    bool leaf = true; // whether not this node is a leaf node
+    bool populated = false; // some nodes might be empty. distinction is important
+    int* indices = nullptr; // array of the indices of the particles inside this node
     octree* children[8] = {};
     octree(vec3* pos, float edge_) {
         position = pos;
@@ -104,10 +104,10 @@ public:
     void check(float vertices[], int indexes[], int array_length, octree* leaf_array[], int* leaf_index) {
         // temporary array to store the indices of the points inside this node
         int* arr = new int[array_length];
-        /*
-            loop through all the indices of the parent node and check which
-            ones are inside the volume of this node.
-        */
+
+        // loop through all the indices of the parent node and check which
+        // ones are inside the volume of this node.
+
         for (int j = 0; j < array_length; j++) {
             int i = indexes[j];
             if (vertices[i] < max_position->x && vertices[i] > min_position->x &&
@@ -120,12 +120,10 @@ public:
             }
         }
 
-        /*
-            the array that was created to store the new indices is as long
-            as the source array, it is unlikely that the new array will
-            contain all the points it's parent node did, so for the sake of
-            efficiency, I am resizing the array to be as small as possible.
-        */
+        // the array that was created to store the new indices is as long
+        // as the source array, it is unlikely that the new array will
+        // contain all the points it's parent node did, so for the sake of
+        // efficiency, I am resizing the array to be as small as possible.
 
         if (population > 0) {
             indices = new int[population];
@@ -171,7 +169,7 @@ public:
         for (int i = 0; i < 8; i++) {
             children[i]->level = level + 1;
             children[i]->check(verts, indices, population, leaf_array, leaf_index);
-        };
+        }
     }
 
     void traverse(octree* target, float* x, float* y, float* z, float* ax, float* ay, float* az) {
@@ -307,20 +305,21 @@ int main() {
         float radius = 1 * (rand() / float(RAND_MAX));
         float x = (cos(curve) - sin(curve));
         float y = (cos(curve) + sin(curve));
-        vertices[i] = radius * x;//1.5 * ((rand() / float(RAND_MAX)) - 0.5);
-        vertices[i + 1] = radius * y;//1.5 * ((rand() / float(RAND_MAX)) - 0.5);
+        vertices[i] = radius * x; // 1.5 * ((rand() / float(RAND_MAX)) - 0.5);
+        vertices[i + 1] = radius * y; // 1.5 * ((rand() / float(RAND_MAX)) - 0.5);
         vertices[i+2] =  0.02 * ((rand() / float(RAND_MAX)) - 0.5);   
         float vel = sqrt(6.67e-11 * NUM_PARTICLES * 200 / radius) * 0.05;
 
-        velocities[i] = -y * vel;//0.0 * ((rand() / float(RAND_MAX)) - 0.5);
-        velocities[i + 1] = x * vel;//0.0 * ((rand() / float(RAND_MAX)) - 0.5);
-        velocities[i + 2] = 0.0;//0.0 * ((rand() / float(RAND_MAX)) - 0.5);
+        velocities[i] = -y * vel; // 0.0 * ((rand() / float(RAND_MAX)) - 0.5);
+        velocities[i + 1] = x * vel; // 0.0 * ((rand() / float(RAND_MAX)) - 0.5);
+        velocities[i + 2] = 0.0; // 0.0 * ((rand() / float(RAND_MAX)) - 0.5);
     }
 
     // every time a new octree is created, it checks the list of particles
     // it's parent contained instead of all of them because a child node
     // cannot contain nodes that the parent did not. the root node does not
     // have a parent, so a list of indices must be provided.
+
     int* seed = new int[NUM_PARTICLES];
     for (int i = 0; i < NUM_PARTICLES; i++) {
         seed[i] = i * 3;
@@ -374,6 +373,7 @@ int main() {
         // octrees until the simulated volume is divided into partitions
         // containing only 1 particle. There is a subdivision limit,
         // so larger sims may need more subdivisions
+
         root->check(vertices, seed, NUM_PARTICLES, leaf_node_array, leaf_index);
         
         // the number of particles each thread need to deal with.
